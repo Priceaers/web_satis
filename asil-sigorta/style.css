@@ -1,0 +1,67 @@
+:root{
+  --paper:#f6f2ea; --paper-2:#ece6d9; --ink:#14233a; --ink-2:#44526a;
+  --brass:#a87a2a; --brass-dark:#7d5a1c; --line:#d9d1c0; --white:#fffdf8;
+  --s1:4px; --s2:8px; --s3:16px; --s4:24px; --s5:40px; --s6:64px; --s7:96px;
+  --r:6px; --max:1120px;
+  --serif:"Fraunces",Georgia,serif; --sans:"Instrument Sans",system-ui,sans-serif;
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);line-height:1.6;font-size:17px}
+img,svg{display:block;max-width:100%}
+a{color:inherit}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--s4)}
+h1,h2,h3{font-family:var(--serif);font-weight:600;line-height:1.15;letter-spacing:-.01em}
+h1{font-size:clamp(2.2rem,5vw,3.6rem)}
+h2{font-size:clamp(1.7rem,3.2vw,2.4rem);margin-bottom:var(--s3)}
+h3{font-size:1.25rem;margin-bottom:var(--s2)}
+.eyebrow{font-size:.8rem;text-transform:uppercase;letter-spacing:.14em;color:var(--brass-dark);font-weight:600;margin-bottom:var(--s3)}
+.btn{display:inline-flex;align-items:center;gap:var(--s2);padding:14px 24px;border-radius:var(--r);font-weight:600;text-decoration:none;border:1.5px solid var(--ink);background:var(--ink);color:var(--white);cursor:pointer;font:inherit;font-weight:600}
+.btn:hover{background:#0c172a}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{background:var(--paper-2)}
+:focus-visible{outline:3px solid var(--brass);outline-offset:3px}
+header{border-bottom:1px solid var(--line);background:var(--paper);position:sticky;top:0;z-index:10}
+.bar{display:flex;align-items:center;justify-content:space-between;height:72px}
+.logo{font-family:var(--serif);font-size:1.4rem;font-weight:700;text-decoration:none}
+.logo span{color:var(--brass)}
+nav{display:flex;gap:var(--s4);align-items:center}
+nav a{text-decoration:none;font-size:.95rem;color:var(--ink-2)}
+nav a:hover{color:var(--ink)}
+.hero{padding:var(--s7) 0 var(--s6)}
+.hero-grid{display:grid;grid-template-columns:1.15fr .85fr;gap:var(--s6);align-items:center}
+.hero p.lead{font-size:1.15rem;color:var(--ink-2);margin:var(--s4) 0;max-width:34em}
+.cta{display:flex;gap:var(--s3);flex-wrap:wrap}
+.hero-card{background:var(--ink);color:var(--white);padding:var(--s5);border-radius:var(--r)}
+.hero-card h2{font-size:1.5rem;color:var(--white)}
+.hero-card ul{list-style:none;padding:0;margin-top:var(--s3)}
+.hero-card li{display:flex;gap:var(--s3);padding:12px 0;border-top:1px solid #2c3d57}
+.hero-card svg{flex:none;width:22px;height:22px;color:#d8b15f}
+section{padding:var(--s7) 0}
+section.alt{background:var(--paper-2)}
+.sec-head{max-width:40em;margin-bottom:var(--s5)}
+.sec-head p{color:var(--ink-2)}
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s4)}
+.card{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:var(--s4)}
+.card svg{width:28px;height:28px;color:var(--brass);margin-bottom:var(--s3)}
+.card p{color:var(--ink-2);font-size:.97rem}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--s5);counter-reset:s;list-style:none;padding:0}
+.steps li{counter-increment:s;border-top:2px solid var(--ink);padding-top:var(--s3)}
+.steps li::before{content:"0" counter(s);font-family:var(--serif);color:var(--brass-dark);font-size:1.1rem;display:block;margin-bottom:var(--s2)}
+.steps p{color:var(--ink-2)}
+.contact-grid{display:grid;grid-template-columns:.9fr 1.1fr;gap:var(--s6)}
+.info p{margin-bottom:var(--s3)}
+.info small{display:block;color:var(--ink-2);font-size:.85rem}
+form{background:var(--white);border:1px solid var(--line);border-radius:var(--r);padding:var(--s5);display:grid;gap:var(--s3)}
+label{font-size:.9rem;font-weight:600;display:grid;gap:6px}
+input,select,textarea{font:inherit;padding:12px;border:1.5px solid var(--line);border-radius:var(--r);background:var(--paper);color:var(--ink)}
+.note{font-size:.82rem;color:var(--ink-2)}
+footer{border-top:1px solid var(--line);padding:var(--s5) 0;font-size:.9rem;color:var(--ink-2)}
+footer .wrap{display:flex;justify-content:space-between;gap:var(--s3);flex-wrap:wrap}
+@media(max-width:860px){
+  .hero-grid,.contact-grid{grid-template-columns:1fr}
+  .products,.steps{grid-template-columns:1fr}
+  nav a:not(.btn){display:none}
+  .hero,section{padding:var(--s6) 0}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
