@@ -25,11 +25,31 @@ if (!intro || reduce || seen) {
 } else {
   intro.querySelectorAll(".word span").forEach((s, i) => (s.style.animationDelay = 0.45 + i * 0.045 + "s"));
   setTimeout(() => {
+    flyLogo();
     intro.classList.add("out");
     start();
     try { sessionStorage.setItem("asil-intro", "1"); } catch (e) {}
     setTimeout(() => intro.remove(), 1100);
   }, 2100);
+}
+
+/* açılıştaki logo, perde kalkarken küredeki yerine uçar */
+function flyLogo() {
+  const from = intro.querySelector(".tile"), to = document.querySelector(".orb-logo");
+  if (!from || !to) return;
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+  if (b.bottom < 0 || b.top > innerHeight) return;
+  document.body.classList.add("wait-logo");
+  const f = document.createElement("div");
+  f.className = "fly";
+  f.innerHTML = '<img src="img/logo-siyah.png" alt="">';
+  Object.assign(f.style, { left: a.left + "px", top: a.top + "px", width: a.width + "px", height: a.height + "px" });
+  document.body.appendChild(f);
+  from.style.visibility = "hidden";
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    Object.assign(f.style, { left: b.left + "px", top: b.top + "px", width: b.width + "px", height: b.height + "px", borderRadius: b.width * 0.28 + "px" });
+  }));
+  setTimeout(() => { document.body.classList.remove("wait-logo"); f.style.opacity = "0"; setTimeout(() => f.remove(), 300); }, 1150);
 }
 
 /* ---- dönen kelime ---- */
