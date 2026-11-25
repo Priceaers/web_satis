@@ -1,66 +1,146 @@
-/* ===== TEK YERDEN AYAR: gerçek bilgileri burada değiştirin ===== */
+/* ===== TEK YERDEN AYAR ===== */
 const CONFIG = {
-  whatsapp: "905000000000",       // ÖRNEK: ülke kodu ile, + ve boşluk olmadan
-  phoneShow: "0500 000 00 00",    // ÖRNEK: sitede görünen telefon
-  poweredUrl: "https://envarsigorta.com" // "Powered by Fahrettin Group" tıklanınca gidecek adres
+  whatsapp: "905408182828",               // WhatsApp numarası (ülke kodu ile)
+  poweredUrl: "https://envarsigorta.com"  // "Powered by Fahrettin Group" bağlantısı
 };
-
-const waLink = (text) => "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(text);
+const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const waLink = (t) => "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(t);
 const HELLO = "Merhaba, Asil Sigorta web sitesinden yazıyorum. Sigorta teklifi almak istiyorum.";
 
-document.querySelectorAll("[data-wa]").forEach((a) => {
-  a.href = waLink(HELLO); a.target = "_blank"; a.rel = "noopener";
-});
-document.querySelectorAll("[data-phone]").forEach((el) => (el.textContent = CONFIG.phoneShow));
-document.querySelectorAll("[data-phone-card]").forEach((a) => (a.href = "tel:+" + CONFIG.whatsapp));
+document.querySelectorAll("[data-wa]").forEach((a) => { a.href = waLink(HELLO); a.target = "_blank"; a.rel = "noopener"; });
 document.getElementById("powered").href = CONFIG.poweredUrl;
 
-/* formlar: WhatsApp'ta hazır mesaj açar */
+/* ---- açılış animasyonu (oturumda bir kez) ---- */
+const intro = document.getElementById("intro");
+let seen = false;
+try { seen = sessionStorage.getItem("asil-intro") === "1"; } catch (e) {}
+function start() {
+  document.body.classList.remove("locked");
+  document.documentElement.classList.add("ready");
+  document.body.classList.add("ready");
+}
+if (!intro || reduce || seen) {
+  if (intro) intro.remove();
+  start();
+} else {
+  intro.querySelectorAll(".word span").forEach((s, i) => (s.style.animationDelay = 0.45 + i * 0.045 + "s"));
+  setTimeout(() => {
+    intro.classList.add("out");
+    start();
+    try { sessionStorage.setItem("asil-intro", "1"); } catch (e) {}
+    setTimeout(() => intro.remove(), 1100);
+  }, 2100);
+}
+
+/* ---- dönen kelime ---- */
+const words = document.querySelectorAll(".rot b");
+if (words.length && !reduce) {
+  let k = 0;
+  setInterval(() => {
+    const cur = words[k]; k = (k + 1) % words.length; const nx = words[k];
+    cur.classList.remove("on"); cur.classList.add("off");
+    nx.classList.remove("off"); nx.classList.add("on");
+    setTimeout(() => cur.classList.remove("off"), 800);
+  }, 2200);
+}
+
+/* ---- formlar ---- */
 document.querySelectorAll("form[data-form]").forEach((form) => {
   form.addEventListener("submit", (e) => {
     e.preventDefault();
     const f = new FormData(form);
-    const text =
-      "Merhaba, sigorta teklifi almak istiyorum.\n" +
+    const text = "Merhaba, sigorta teklifi almak istiyorum.\n" +
       "Ad Soyad: " + String(f.get("ad")).trim() + "\n" +
       "Telefon: " + String(f.get("tel")).trim() + "\n" +
       "Sigorta türü: " + f.get("tur") + "\n" +
-      "Not: " + (f.get("not") || "-");
+      "Not: " + (String(f.get("not") || "").trim() || "-");
     const w = window.open(waLink(text), "_blank", "noopener");
     if (!w) window.location.href = waLink(text);
   });
 });
+document.querySelectorAll("[data-pick]").forEach((a) => a.addEventListener("click", () => {
+  const r = document.querySelector('input[name="tur"][value="' + a.dataset.pick + '"]');
+  if (r) r.checked = true;
+}));
 
-/* ürün kartındaki "Teklif al" hızlı formda türü seçer */
-document.querySelectorAll("[data-pick]").forEach((a) => {
-  a.addEventListener("click", () => {
-    const r = document.querySelector('#teklif input[name="tur"][value="' + a.dataset.pick + '"]');
-    if (r) r.checked = true;
-    const sel = document.getElementById("d-tur");
-    if (sel) sel.value = a.dataset.pick;
-  });
+/* ---- mobil menü ---- */
+const burger = document.querySelector(".burger"), menu = document.getElementById("menu");
+burger.addEventListener("click", () => {
+  const open = menu.classList.toggle("open");
+  burger.setAttribute("aria-expanded", String(open));
+  burger.setAttribute("aria-label", open ? "Menüyü kapat" : "Menüyü aç");
 });
+menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => {
+  menu.classList.remove("open"); burger.setAttribute("aria-expanded", "false");
+}));
 
-/* belirme animasyonu */
-const rv = document.querySelectorAll(".rv");
-if ("IntersectionObserver" in window) {
-  const io = new IntersectionObserver((es) => {
-    es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } });
-  }, { threshold: 0.1 });
-  rv.forEach((el, i) => { el.style.transitionDelay = (i % 3) * 70 + "ms"; io.observe(el); });
-} else {
-  rv.forEach((el) => el.classList.add("in"));
+/* ---- kaydırınca belirme ---- */
+const io = new IntersectionObserver((es) => es.forEach((e) => {
+  if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+}), { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
+document.querySelectorAll(".rv").forEach((el, i) => { el.style.transitionDelay = (i % 3) * 90 + "ms"; io.observe(el); });
+
+/* ---- kaydırma: ilerleme çubuğu, adım çizgisi, "neden biz" vurgusu ---- */
+const root = document.documentElement, steps = document.getElementById("steps");
+const whyItems = document.querySelectorAll(".why-list li"), stepItems = steps.querySelectorAll("li");
+function onScroll() {
+  const max = root.scrollHeight - innerHeight;
+  root.style.setProperty("--p", max > 0 ? scrollY / max : 0);
+  const r = steps.getBoundingClientRect();
+  const sp = Math.min(1, Math.max(0, (innerHeight * 0.8 - r.top) / (r.height + innerHeight * 0.3)));
+  steps.style.setProperty("--sp", sp);
+  stepItems.forEach((li, i) => li.classList.toggle("lit", sp >= i / (stepItems.length - 1) - 0.02));
+  const mid = innerHeight * 0.5;
+  whyItems.forEach((li) => { const b = li.getBoundingClientRect(); li.classList.toggle("lit", b.top < mid && b.bottom > mid); });
+}
+addEventListener("scroll", onScroll, { passive: true }); onScroll();
+
+/* ---- imleç: ışık, küre, kart eğimi, mıknatıs düğmeler ---- */
+const fine = window.matchMedia("(pointer: fine)").matches;
+if (fine && !reduce) {
+  const fx = document.querySelector(".fx"), orb = document.querySelector(".orb");
+  addEventListener("pointermove", (e) => {
+    fx.style.setProperty("--cx", e.clientX + "px"); fx.style.setProperty("--cy", e.clientY + "px");
+    if (orb) {
+      orb.style.setProperty("--rx", ((e.clientX / innerWidth) - 0.5) * 24 + "deg");
+      orb.style.setProperty("--ry", -((e.clientY / innerHeight) - 0.5) * 24 + "deg");
+    }
+  }, { passive: true });
+  document.querySelectorAll("[data-tilt]").forEach((c) => {
+    c.addEventListener("pointermove", (e) => {
+      const b = c.getBoundingClientRect(), x = (e.clientX - b.left) / b.width, y = (e.clientY - b.top) / b.height;
+      c.style.setProperty("--mx", x * 100 + "%"); c.style.setProperty("--my", y * 100 + "%");
+      c.style.transform = "perspective(900px) rotateX(" + (0.5 - y) * 8 + "deg) rotateY(" + (x - 0.5) * 8 + "deg) translateY(-4px)";
+    });
+    c.addEventListener("pointerleave", () => (c.style.transform = ""));
+  });
+  document.querySelectorAll("[data-mag]").forEach((b) => {
+    b.addEventListener("pointermove", (e) => {
+      const r = b.getBoundingClientRect();
+      b.style.transform = "translate(" + (e.clientX - r.left - r.width / 2) * 0.18 + "px," + (e.clientY - r.top - r.height / 2) * 0.25 + "px)";
+    });
+    b.addEventListener("pointerleave", () => (b.style.transform = ""));
+  });
 }
 
-/* mobil menü */
-const burger = document.querySelector(".burger");
-const menu = document.getElementById("menu");
-if (burger && menu) {
-  burger.addEventListener("click", () => {
-    const open = menu.classList.toggle("open");
-    burger.setAttribute("aria-expanded", String(open));
-  });
-  menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => {
-    menu.classList.remove("open"); burger.setAttribute("aria-expanded", "false");
-  }));
+/* ---- Instagram telefonu: akış kayar, kalp atar ---- */
+const posts = document.getElementById("posts");
+if (posts) {
+  const clock = document.querySelector("[data-clock]");
+  const d = new Date(); clock.textContent = String(d.getHours()).padStart(2, "0") + ":" + String(d.getMinutes()).padStart(2, "0");
+  const items = posts.querySelectorAll(".post");
+  let n = 0;
+  const like = (p) => {
+    const h = p.querySelector(".heart"), b = p.querySelector(".burst");
+    b.classList.remove("go"); void b.offsetWidth; b.classList.add("go");
+    h.classList.add("on");
+  };
+  items.forEach((p) => p.querySelector(".pimg").addEventListener("dblclick", () => like(p)));
+  if (!reduce) {
+    setInterval(() => {
+      n = (n + 1) % items.length;
+      posts.style.transform = "translateY(-" + items[n].offsetTop + "px)";
+      setTimeout(() => like(items[n]), 900);
+    }, 3200);
+  }
 }
