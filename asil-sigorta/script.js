@@ -1,7 +1,7 @@
 /* ===== TEK YERDEN AYAR ===== */
 const CONFIG = {
   whatsapp: "905408182828",               // WhatsApp numarası (ülke kodu ile)
-  poweredUrl: "https://envarsigorta.com"  // "Powered by Fahrettin Group" bağlantısı
+  poweredUrl: "https://fahrettingroup.net"  // "Powered by Fahrettin Group" bağlantısı
 };
 const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 const waLink = (t) => "https://wa.me/" + CONFIG.whatsapp + "?text=" + encodeURIComponent(t);
@@ -54,8 +54,8 @@ document.querySelectorAll("form[data-form]").forEach((form) => {
       "Telefon: " + String(f.get("tel")).trim() + "\n" +
       "Sigorta türü: " + f.get("tur") + "\n" +
       "Not: " + (String(f.get("not") || "").trim() || "-");
-    const w = window.open(waLink(text), "_blank", "noopener");
-    if (!w) window.location.href = waLink(text);
+    const w = window.open(waLink(text), "_blank");
+    if (w) w.opener = null; else window.location.href = waLink(text);
   });
 });
 document.querySelectorAll("[data-pick]").forEach((a) => a.addEventListener("click", () => {
@@ -70,13 +70,13 @@ burger.addEventListener("click", () => {
   burger.setAttribute("aria-expanded", String(open));
   burger.setAttribute("aria-label", open ? "Menüyü kapat" : "Menüyü aç");
 });
-menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => {
-  menu.classList.remove("open"); burger.setAttribute("aria-expanded", "false");
-}));
+function closeMenu() { menu.classList.remove("open"); burger.setAttribute("aria-expanded", "false"); burger.setAttribute("aria-label", "Menüyü aç"); }
+menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", closeMenu));
+addEventListener("keydown", (e) => { if (e.key === "Escape" && menu.classList.contains("open")) { closeMenu(); burger.focus(); } });
 
 /* ---- kaydırınca belirme ---- */
 const io = new IntersectionObserver((es) => es.forEach((e) => {
-  if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+  if (e.isIntersecting) { const t = e.target; t.classList.add("in"); io.unobserve(t); setTimeout(() => (t.style.transitionDelay = ""), 1300); }
 }), { threshold: 0.12, rootMargin: "0px 0px -40px 0px" });
 document.querySelectorAll(".rv").forEach((el, i) => { el.style.transitionDelay = (i % 3) * 90 + "ms"; io.observe(el); });
 
@@ -89,7 +89,7 @@ function onScroll() {
   const r = steps.getBoundingClientRect();
   const sp = Math.min(1, Math.max(0, (innerHeight * 0.8 - r.top) / (r.height + innerHeight * 0.3)));
   steps.style.setProperty("--sp", sp);
-  stepItems.forEach((li, i) => li.classList.toggle("lit", sp >= i / (stepItems.length - 1) - 0.02));
+  stepItems.forEach((li, i) => li.classList.toggle("lit", sp > 0 && sp >= i / (stepItems.length - 1) - 0.02));
   const mid = innerHeight * 0.5;
   whyItems.forEach((li) => { const b = li.getBoundingClientRect(); li.classList.toggle("lit", b.top < mid && b.bottom > mid); });
 }
