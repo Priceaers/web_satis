@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+# Alan adı belli olunca ekleyin:
+# Sitemap: https://ALANADI/asil-sigorta/sitemap.xml
